@@ -1,0 +1,39 @@
+@server_HostAddress = http://localhost:5142
+
+POST {{server_HostAddress}}/api/auth/register
+Content-Type: application/json
+
+{
+  "username": "admin_denji",
+  "email": "admin@eticket.io",
+  "password": "V9#kL2$mP7!xQ8@wZ4",
+  "role": "Admin"
+}
+
+###
+
+POST {{server_HostAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@eticket.io",
+  "password": "V9#kL2$mP7!xQ8@wZ4"
+}
+
+###
+
+POST {{server_HostAddress}}/api/auth/refresh
+Content-Type: application/json
+
+{
+  "refresh_token": "YOUR_REFRESH_TOKEN_HERE"
+}
+
+###
+
+POST {{server_HostAddress}}/api/auth/revoke
+Content-Type: application/json
+
+{
+  "refresh_token": "YOUR_REFRESH_TOKEN_HERE"
+}

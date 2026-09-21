@@ -40,9 +40,6 @@ public class AuthService : IAuthService
 
         var user = _mapper.Map<User>(registerDto);
         user.Password = _passwordHasher.Hash(registerDto.Password);
-        user.Role = registerDto.Role ?? UserRole.User;
-        user.CreatedAt = DateTime.UtcNow;
-        user.UpdatedAt = DateTime.UtcNow;
 
         var createdUser = await _userRepository.Create(user);
         return await GenerateAuthResponse(createdUser);
@@ -109,7 +106,8 @@ public class AuthService : IAuthService
             AccessToken = accessToken,
             RefreshToken = refreshToken.Token,
             AccessTokenExpiresAt = accessExpires,
-            RefreshTokenExpiresAt = refreshExpires
+            RefreshTokenExpiresAt = refreshExpires,
+            User = _mapper.Map<UserDto>(user)
         };
     }
 

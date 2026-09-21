@@ -19,10 +19,9 @@ public class EventService : IEventService
     public async Task<BaseResponse<IEnumerable<EventResponseDto>>> GetAll(EventQueryDto query)
     {
         var (items, totalCount) = await _eventRepository.GetAll(query);
-        var mappedItems = _mapper.Map<IEnumerable<EventResponseDto>>(items);
 
         return new BaseResponse<IEnumerable<EventResponseDto>>(
-            mappedItems,
+            items,
             new PaginationMeta
             {
                 TotalCount = totalCount,

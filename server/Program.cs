@@ -1,20 +1,21 @@
 using System.Text;
 using DotNetEnv;
+using Mapster;
+using MapsterMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using Npgsql;
+using Serilog;
 using server.src.Config;
 using server.src.Data;
 using server.src.Mapper;
 using server.src.Middlewares;
-using Mapster;
-using MapsterMapper;
 using server.src.Repositories;
 using server.src.Services;
-using Serilog;
+using StackExchange.Redis;
 
 Env.TraversePath().Load();
 EnvValidator.ValidateAll();
@@ -34,6 +35,7 @@ var dbPort = EnvValidator.GetRequiredInt("DB_PORT");
 var dbName = EnvValidator.GetRequired("DB_DATABASE");
 var dbUser = EnvValidator.GetRequired("DB_USERNAME");
 var dbPass = EnvValidator.GetRequired("DB_PASSWORD");
+var redisConnectionString = EnvValidator.GetRequired("REDIS_CONNECTION");
 
 var connBuilder = new NpgsqlConnectionStringBuilder
 {
@@ -64,6 +66,12 @@ builder.Services.AddScoped<IMapper, ServiceMapper>();
 builder.Services.Configure<RouteOptions>(options =>
 {
     options.LowercaseUrls = true;
+});
+builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
+{
+    var configuration = ConfigurationOptions.Parse(redisConnectionString);
+    configuration.AbortOnConnectFail = false;
+    return ConnectionMultiplexer.Connect(configuration);
 });
 
 builder.Services.AddControllers(options =>

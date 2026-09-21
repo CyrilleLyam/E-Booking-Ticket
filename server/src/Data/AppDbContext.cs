@@ -13,6 +13,8 @@ public class AppDbContext : DbContext
     public DbSet<User> Users => Set<User>();
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
     public DbSet<Event> Events => Set<Event>();
+    public DbSet<Order> Orders => Set<Order>();
+    public DbSet<Ticket> Tickets => Set<Ticket>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -21,6 +23,44 @@ public class AppDbContext : DbContext
             .Property(u => u.Role)
             .HasConversion<string>()
             .HasDefaultValue(UserRole.User);
+
+        modelBuilder.Entity<Order>(entity =>
+        {
+            entity.Property(o => o.Status)
+                .HasConversion<string>()
+                .HasDefaultValue(OrderStatus.Pending);
+
+            entity.Property(o => o.TotalAmount)
+                .HasPrecision(10, 2);
+
+            entity.HasIndex(o => o.IdempotencyKey)
+                .IsUnique();
+
+            entity.HasOne(o => o.User)
+                .WithMany()
+                .HasForeignKey(o => o.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<Ticket>(entity =>
+        {
+            entity.Property(t => t.Status)
+                .HasConversion<string>()
+                .HasDefaultValue(TicketStatus.Available);
+
+            entity.HasIndex(t => new { t.EventId, t.SeatIdentifier })
+                .IsUnique();
+
+            entity.HasOne(t => t.Event)
+                .WithMany()
+                .HasForeignKey(t => t.EventId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(t => t.Order)
+                .WithMany(o => o.Tickets)
+                .HasForeignKey(t => t.OrderId)
+                .OnDelete(DeleteBehavior.SetNull);
+        });
     }
 
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)

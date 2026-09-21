@@ -8,7 +8,10 @@ public class UserMapper : IRegister
 {
     public void Register(TypeAdapterConfig config)
     {
-        config.NewConfig<RegisterDto, User>();
+        config.NewConfig<RegisterDto, User>()
+            .Ignore(dest => dest.Password)
+            .Map(dest => dest.Role, src => src.Role ?? UserRole.User);
+
         config.NewConfig<User, UserDto>();
     }
 }

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using server.src.Data;
@@ -11,9 +12,11 @@ using server.src.Data;
 namespace server.src.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260921121910_AddPriceAndStatusToEventsTable")]
+    partial class AddPriceAndStatusToEventsTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -31,82 +34,63 @@ namespace server.src.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("AvailableSeats")
+                        .HasColumnType("integer")
+                        .HasColumnName("available_seats");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("description");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("end_date");
+
+                    b.Property<string>("Location")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("location");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("name");
 
-                    b.Property<DateTime>("StartTime")
+                    b.Property<DateTime>("StartDate")
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("start_time");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
-
-                    b.Property<int>("VenueCapacity")
-                        .HasColumnType("integer")
-                        .HasColumnName("venue_capacity");
-
-                    b.HasKey("Id")
-                        .HasName("pk_events");
-
-                    b.ToTable("events", (string)null);
-                });
-
-            modelBuilder.Entity("server.src.Models.Order", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
-
-                    b.Property<string>("IdempotencyKey")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("idempotency_key");
+                        .HasColumnName("start_date");
 
                     b.Property<string>("Status")
                         .IsRequired()
                         .ValueGeneratedOnAdd()
                         .HasColumnType("text")
-                        .HasDefaultValue("Pending")
+                        .HasDefaultValue("Published")
                         .HasColumnName("status");
 
-                    b.Property<decimal>("TotalAmount")
+                    b.Property<decimal>("TicketPrice")
+                        .ValueGeneratedOnAdd()
                         .HasPrecision(10, 2)
                         .HasColumnType("numeric(10,2)")
-                        .HasColumnName("total_amount");
+                        .HasDefaultValue(0.00m)
+                        .HasColumnName("ticket_price");
+
+                    b.Property<int>("TotalSeats")
+                        .HasColumnType("integer")
+                        .HasColumnName("total_seats");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer")
-                        .HasColumnName("user_id");
-
                     b.HasKey("Id")
-                        .HasName("pk_orders");
+                        .HasName("pk_events");
 
-                    b.HasIndex("IdempotencyKey")
-                        .IsUnique()
-                        .HasDatabaseName("ix_orders_idempotency_key");
-
-                    b.HasIndex("UserId")
-                        .HasDatabaseName("ix_orders_user_id");
-
-                    b.ToTable("orders", (string)null);
+                    b.ToTable("events", (string)null);
                 });
 
             modelBuilder.Entity("server.src.Models.RefreshToken", b =>
@@ -146,60 +130,6 @@ namespace server.src.Migrations
                         .HasDatabaseName("ix_refresh_tokens_user_id");
 
                     b.ToTable("refresh_tokens", (string)null);
-                });
-
-            modelBuilder.Entity("server.src.Models.Ticket", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
-
-                    b.Property<int>("EventId")
-                        .HasColumnType("integer")
-                        .HasColumnName("event_id");
-
-                    b.Property<DateTime?>("HeldUntil")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("held_until");
-
-                    b.Property<int?>("OrderId")
-                        .HasColumnType("integer")
-                        .HasColumnName("order_id");
-
-                    b.Property<string>("SeatIdentifier")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("seat_identifier");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("text")
-                        .HasDefaultValue("Available")
-                        .HasColumnName("status");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
-
-                    b.HasKey("Id")
-                        .HasName("pk_tickets");
-
-                    b.HasIndex("OrderId")
-                        .HasDatabaseName("ix_tickets_order_id");
-
-                    b.HasIndex("EventId", "SeatIdentifier")
-                        .IsUnique()
-                        .HasDatabaseName("ix_tickets_event_id_seat_identifier");
-
-                    b.ToTable("tickets", (string)null);
                 });
 
             modelBuilder.Entity("server.src.Models.User", b =>
@@ -247,18 +177,6 @@ namespace server.src.Migrations
                     b.ToTable("users", (string)null);
                 });
 
-            modelBuilder.Entity("server.src.Models.Order", b =>
-                {
-                    b.HasOne("server.src.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("fk_orders_users_user_id");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("server.src.Models.RefreshToken", b =>
                 {
                     b.HasOne("server.src.Models.User", "User")
@@ -269,31 +187,6 @@ namespace server.src.Migrations
                         .HasConstraintName("fk_refresh_tokens_users_user_id");
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("server.src.Models.Ticket", b =>
-                {
-                    b.HasOne("server.src.Models.Event", "Event")
-                        .WithMany()
-                        .HasForeignKey("EventId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("fk_tickets_events_event_id");
-
-                    b.HasOne("server.src.Models.Order", "Order")
-                        .WithMany("Tickets")
-                        .HasForeignKey("OrderId")
-                        .OnDelete(DeleteBehavior.SetNull)
-                        .HasConstraintName("fk_tickets_orders_order_id");
-
-                    b.Navigation("Event");
-
-                    b.Navigation("Order");
-                });
-
-            modelBuilder.Entity("server.src.Models.Order", b =>
-                {
-                    b.Navigation("Tickets");
                 });
 
             modelBuilder.Entity("server.src.Models.User", b =>

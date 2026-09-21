@@ -7,7 +7,7 @@ Accept: application/json
 
 ###
 
-GET {{server_HostAddress}}/api/events?name=Festival&start_date=2026-10-01T00:00:00Z&end_date=2026-10-31T23:59:59Z&page=1&page_size=10
+GET {{server_HostAddress}}/api/events?name=Festival&start_time=2026-10-01T00:00:00Z&page=1&page_size=10
 Authorization: Bearer {{token}}
 Accept: application/json
 
@@ -25,11 +25,8 @@ Content-Type: application/json
 
 {
   "name": "Rock Festival 2026",
-  "description": "Annual open air music festival",
-  "start_date": "2026-10-01T18:00:00Z",
-  "end_date": "2026-10-01T23:00:00Z",
-  "location": "Olympic Stadium",
-  "total_seats": 500
+  "start_time": "2026-10-01T18:00:00Z",
+  "venue_capacity": 500
 }
 
 ###
@@ -40,7 +37,7 @@ Content-Type: application/json
 
 {
   "name": "Rock Festival 2026 (Updated)",
-  "total_seats": 600
+  "venue_capacity": 600
 }
 
 ###

@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
-using server.src.Models;
 using server.src.Data;
+using server.src.Models;
 
 namespace server.src.Repositories;
 

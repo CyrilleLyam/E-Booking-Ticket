@@ -1,39 +1,41 @@
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace server.src.Migrations
 {
     /// <inheritdoc />
-    public partial class AddSeatsToEventsTable : Migration
+    public partial class AddPriceAndStatusToEventsTable : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<int>(
-                name: "available_seats",
+            migrationBuilder.AddColumn<string>(
+                name: "status",
                 table: "events",
-                type: "integer",
+                type: "text",
                 nullable: false,
-                defaultValue: 0);
+                defaultValue: "Published");
 
-            migrationBuilder.AddColumn<int>(
-                name: "total_seats",
+            migrationBuilder.AddColumn<decimal>(
+                name: "ticket_price",
                 table: "events",
-                type: "integer",
+                type: "numeric(10,2)",
+                precision: 10,
+                scale: 2,
                 nullable: false,
-                defaultValue: 0);
+                defaultValue: 0.00m);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "available_seats",
+                name: "status",
                 table: "events");
 
             migrationBuilder.DropColumn(
-                name: "total_seats",
+                name: "ticket_price",
                 table: "events");
         }
     }

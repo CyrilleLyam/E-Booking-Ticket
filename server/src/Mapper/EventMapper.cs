@@ -8,8 +8,7 @@ public class EventMapper : IRegister
 {
     public void Register(TypeAdapterConfig config)
     {
-        config.NewConfig<CreateEventDto, Event>()
-            .Map(dest => dest.AvailableSeats, src => src.TotalSeats);
+        config.NewConfig<CreateEventDto, Event>();
         config.NewConfig<UpdateEventDto, Event>()
             .IgnoreNullValues(true);
         config.NewConfig<Event, EventResponseDto>();

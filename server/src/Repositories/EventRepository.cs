@@ -1,13 +1,14 @@
+using Mapster;
 using Microsoft.EntityFrameworkCore;
+using server.src.Data;
 using server.src.Dtos;
 using server.src.Models;
-using server.src.Data;
 
 namespace server.src.Repositories;
 
 public class EventRepository : IEventRepository
 {
-        private readonly AppDbContext _context;
+    private readonly AppDbContext _context;
     public EventRepository(AppDbContext context)
     {
         _context = context;
@@ -15,7 +16,7 @@ public class EventRepository : IEventRepository
 
     public async Task<Event> Create(Event eventEntity)
     {
-         _context.Events.Add(eventEntity);
+        _context.Events.Add(eventEntity);
         await _context.SaveChangesAsync();
         return eventEntity;
     }
@@ -30,7 +31,7 @@ public class EventRepository : IEventRepository
         }
     }
 
-    public async Task<(IEnumerable<Event> Items, int TotalCount)> GetAll(EventQueryDto queryDto)
+    public async Task<(IEnumerable<EventResponseDto> Items, int TotalCount)> GetAll(EventQueryDto queryDto)
     {
         var query = _context.Events.AsNoTracking();
 
@@ -39,14 +40,9 @@ public class EventRepository : IEventRepository
             query = query.Where(e => EF.Functions.ILike(e.Name, $"%{queryDto.Name.Trim()}%"));
         }
 
-        if (queryDto.StartDate.HasValue)
+        if (queryDto.StartTime.HasValue)
         {
-            query = query.Where(e => e.StartDate >= queryDto.StartDate.Value);
-        }
-
-        if (queryDto.EndDate.HasValue)
-        {
-            query = query.Where(e => e.EndDate <= queryDto.EndDate.Value);
+            query = query.Where(e => e.StartTime >= queryDto.StartTime.Value);
         }
 
         var totalCount = await query.CountAsync();
@@ -55,6 +51,7 @@ public class EventRepository : IEventRepository
             .ThenBy(e => e.Id)
             .Skip((queryDto.Page - 1) * queryDto.PageSize)
             .Take(queryDto.PageSize)
+            .ProjectToType<EventResponseDto>()
             .ToListAsync();
 
         return (items, totalCount);

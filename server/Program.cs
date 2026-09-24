@@ -15,6 +15,7 @@ using server.src.Mapper;
 using server.src.Middlewares;
 using server.src.Repositories;
 using server.src.Services;
+using server.src.Workers;
 using StackExchange.Redis;
 
 Env.TraversePath().Load();
@@ -58,6 +59,7 @@ builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IEventRepository, EventRepository>();
 builder.Services.AddScoped<IEventService, EventService>();
+builder.Services.AddScoped<IQueueService, QueueService>();
 var mapsterConfig = TypeAdapterConfig.GlobalSettings;
 mapsterConfig.Scan(typeof(UserMapper).Assembly);
 builder.Services.AddSingleton(mapsterConfig);
@@ -73,6 +75,7 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
     configuration.AbortOnConnectFail = false;
     return ConnectionMultiplexer.Connect(configuration);
 });
+builder.Services.AddHostedService<ValveWorker>();
 
 builder.Services.AddControllers(options =>
 {
